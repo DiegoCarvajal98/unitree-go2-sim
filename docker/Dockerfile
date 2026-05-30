@@ -87,6 +87,7 @@ RUN mkdir -p /overlay_ws/src
 WORKDIR /overlay_ws
 
 COPY src/go2_ign_bringup/ /overlay_ws/src/go2_ign_bringup/
+COPY src/go2_nav/        /overlay_ws/src/go2_nav/
 
 RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     source /go2_ws/install/setup.bash && \

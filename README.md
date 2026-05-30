@@ -54,7 +54,7 @@ Gazebo Fortress opens with the Go2 standing on a ground plane. The CHAMP locomot
 
 ---
 
-## Control the Robot
+## Basic control of the Robot
 
 In a second terminal, attach to the running container:
 
@@ -73,6 +73,12 @@ ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z:
 
 # Stop
 ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{}"
+```
+
+Or run the 'teleop_twist_keyboard' node
+
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
 ---
