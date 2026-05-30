@@ -1,0 +1,19 @@
+# Upstream source cloned during Docker build — not tracked here
+src/unitree-go2-ros2/
+
+# Colcon build artifacts (dev container volume mounts)
+.colcon/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ROS / colcon
+build/
+install/
+log/
+
+# IDE
+.vscode/
+.idea/

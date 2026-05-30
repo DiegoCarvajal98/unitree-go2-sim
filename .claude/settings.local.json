@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(ssh -T git@github.com)",
+      "Bash(sudo apt install curl -y)",
+      "Bash(curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg)",
+      "Bash(sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg)",
+      "Bash(sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg)",
+      "Bash(dpkg --print-architecture)",
+      "Bash(echo \"deb [arch=$\\(dpkg --print-architecture\\) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\")",
+      "Bash(sudo tee /etc/apt/sources.list.d/github-cli.list)",
+      "Bash(sudo apt update)",
+      "Bash(sudo apt install gh -y)",
+      "Read(//home/diego/.ssh/**)",
+      "Bash(ssh-keygen *)",
+      "Bash(git clone *)",
+      "Bash(xargs ls)",
+      "Bash(chmod +x /home/diego/unitree-go2-sim/scripts/build.sh /home/diego/unitree-go2-sim/scripts/run_sim.sh)",
+      "Bash(chmod +x /home/diego/unitree-go2-sim/docker/entrypoint.sh)",
+      "Bash(dpkg -l nvidia-container-toolkit)",
+      "Bash(docker info *)",
+      "Bash(nvidia-smi)",
+      "Bash(dpkg -l nvidia-container-toolkit 2>/dev/null | grep ^ii; cat /etc/docker/daemon.json 2>/dev/null || echo \"no daemon.json\"; docker info 2>/dev/null | grep -i \"runtime\\\\|nvidia\")",
+      "Read(//etc/docker/**)",
+      "Read(//etc/apt/sources.list.d/**)",
+      "Bash(dpkg -l)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

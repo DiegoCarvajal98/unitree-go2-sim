@@ -1,0 +1,70 @@
+services:
+  # ── Base: ROS 2 + Gazebo Fortress + CHAMP/Go2 (pre-built)
+  base:
+    image: go2-sim:base
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: base
+    stdin_open: true
+    tty: true
+    network_mode: host
+    ipc: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-${HOME}/.Xauthority}:/root/.Xauthority:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # ── Overlay: includes go2_ign_bringup (Fortress launch + bridge)
+  overlay:
+    extends:
+      service: base
+    image: go2-sim:overlay
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: overlay
+
+  # ── Sim: run simulation directly
+  sim:
+    extends:
+      service: overlay
+    command: >
+      ros2 launch go2_ign_bringup go2_sim.launch.py
+
+  # ── Dev: source-mounted for live editing
+  dev:
+    extends:
+      service: overlay
+    image: go2-sim:dev
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+      args:
+        USERNAME: diego
+        USER_UID: ${USER_UID:-1000}
+        USER_GID: ${USER_UID:-1000}
+    user: diego
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XAUTHORITY:-${HOME}/.Xauthority}:/home/diego/.Xauthority:ro
+      # Live-edit the bringup package without rebuilding the image
+      - ./src/go2_ign_bringup/:/overlay_ws/src/go2_ign_bringup/:rw
+      # Colcon build cache (persisted across container restarts)
+      - ./.colcon/build/:/overlay_ws/build/:rw
+      - ./.colcon/install/:/overlay_ws/install/:rw
+      - ./.colcon/log/:/overlay_ws/log/:rw
+    command: sleep infinity
