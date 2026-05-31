@@ -83,6 +83,33 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
 ---
 
+## Autonomous Navigation (go2_nav)
+
+The `go2_nav` package provides pre-built navigation behaviours. With the simulation running, start the dev container and run:
+
+```bash
+# Square trajectory — 1 m sides, default speed
+ros2 launch go2_nav square.launch.py
+
+# Larger square at higher speed, looping indefinitely
+ros2 launch go2_nav square.launch.py side_length:=2.0 linear_speed:=0.3 loop:=true
+```
+
+Or run the node directly:
+
+```bash
+ros2 run go2_nav square_trajectory --ros-args -p side_length:=1.5 -p loop:=true
+```
+
+| Parameter | Default | Description |
+|---|---|---|
+| `side_length` | `1.0` | Side length in metres |
+| `linear_speed` | `0.25` | Forward speed (m/s) |
+| `angular_speed` | `0.5` | Turn speed (rad/s) |
+| `loop` | `false` | Repeat the square indefinitely |
+
+---
+
 ## Repository Structure
 
 ```
@@ -96,14 +123,19 @@ unitree-go2-sim/
 │   ├── build.sh            # docker compose build (all stages)
 │   └── run_sim.sh          # xhost + docker compose run --rm sim
 └── src/
-    └── go2_ign_bringup/    # Custom ROS 2 package (Fortress bringup)
-        ├── launch/
-        │   └── go2_sim.launch.py   # Main launch file
-        ├── config/
-        │   ├── go2_controllers.yaml  # ros2_control: effort JointTrajectoryController
-        │   └── gz_bridge.yaml        # ROS↔Gazebo topic bridge
-        └── worlds/
-            └── go2_world.sdf         # Gazebo Fortress world
+    ├── go2_ign_bringup/    # Gazebo Fortress bringup package
+    │   ├── launch/
+    │   │   └── go2_sim.launch.py   # Main launch file
+    │   ├── config/
+    │   │   ├── go2_controllers.yaml  # ros2_control: effort JointTrajectoryController
+    │   │   └── gz_bridge.yaml        # ROS↔Gazebo topic bridge
+    │   └── worlds/
+    │       └── go2_world.sdf         # Gazebo Fortress world
+    └── go2_nav/            # Navigation nodes
+        ├── go2_nav/
+        │   └── square_trajectory.py  # Timed square trajectory node
+        └── launch/
+            └── square.launch.py
 ```
 
 > `src/unitree-go2-ros2/` is not tracked in git — it is cloned automatically during the Docker build from [anujjain-dev/unitree-go2-ros2](https://github.com/anujjain-dev/unitree-go2-ros2), which bundles CHAMP, `go2_description`, and `go2_config`.
@@ -118,7 +150,7 @@ The Dockerfile has three stages that build on each other:
 
 **`base`** — Installs ROS 2 Humble, Gazebo Fortress integration packages (`ros-humble-ros-ign-*`, `ros-humble-ign-ros2-control`), clones the upstream `unitree-go2-ros2` monorepo, applies URDF patches, and builds everything at `/go2_ws`.
 
-**`overlay`** — Copies `src/go2_ign_bringup/` into `/overlay_ws` and builds it with both the ROS install and `/go2_ws` sourced.
+**`overlay`** — Copies `src/go2_ign_bringup/` and `src/go2_nav/` into `/overlay_ws` and builds them with both the ROS install and `/go2_ws` sourced.
 
 **`dev`** — Adds a non-root user (`diego`, UID 1000) and is intended for iterative development with the source volume-mounted (no image rebuild needed for launch/config changes).
 
@@ -179,19 +211,22 @@ The upstream URDF ships with Gazebo Classic plugin names. The Dockerfile patches
 
 ## Development Workflow
 
-Use the `dev` service for iterating on `go2_ign_bringup` without rebuilding the image:
+Use the `dev` service for iterating on any package under `src/` without rebuilding the image. Both `go2_ign_bringup` and `go2_nav` are volume-mounted:
 
 ```bash
 # Start dev container (source is volume-mounted)
 docker compose run --rm dev bash
 
-# Inside the container — rebuild after editing launch/config files
+# Inside the container — rebuild after editing any source file
 cd /overlay_ws
-colcon build --symlink-install --packages-select go2_ign_bringup
+colcon build --symlink-install --packages-select go2_ign_bringup go2_nav
 source install/setup.bash
 
-# Launch from inside dev container
+# Launch the simulation
 ros2 launch go2_ign_bringup go2_sim.launch.py
+
+# In another shell — run the square trajectory
+ros2 launch go2_nav square.launch.py
 ```
 
 ### Useful ROS 2 Commands (inside container)
