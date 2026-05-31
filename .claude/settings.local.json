@@ -27,7 +27,11 @@
       "Read(//etc/apt/sources.list.d/**)",
       "Bash(dpkg -l)",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git branch *)",
+      "Bash(gh repo *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

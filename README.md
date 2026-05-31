@@ -75,7 +75,7 @@ ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z:
 ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{}"
 ```
 
-Or run the 'teleop_twist_keyboard' node
+Or run the `teleop_twist_keyboard` node:
 
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard

@@ -3,7 +3,7 @@ project(go2_ign_bringup)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY launch worlds config
+install(DIRECTORY launch worlds config xacro
   DESTINATION share/${PROJECT_NAME}
 )
 

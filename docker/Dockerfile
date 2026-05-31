@@ -44,6 +44,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-nav2-bringup \
     ros-${ROS_DISTRO}-joy \
     ros-${ROS_DISTRO}-robot-localization \
+    # Autonomous navigation
+    ros-${ROS_DISTRO}-navigation2 \
+    ros-${ROS_DISTRO}-slam-toolbox \
     && rm -rf /var/lib/apt/lists/*
 
 # Build workspace: CHAMP + Go2 description/config

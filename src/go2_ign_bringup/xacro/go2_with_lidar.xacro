@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!--
+  Entry-point xacro for the Go2 simulation with Fortress 2D LiDAR.
+  Used by go2_sim.launch.py instead of the upstream robot.xacro so that
+  lidar_ign.xacro can be composed in without patching upstream files.
+-->
+<robot name="go2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find go2_description)/xacro/robot.xacro"/>
+  <xacro:include filename="$(find go2_ign_bringup)/xacro/lidar_ign.xacro"/>
+</robot>

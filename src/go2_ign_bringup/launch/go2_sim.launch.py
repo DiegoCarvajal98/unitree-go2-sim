@@ -16,9 +16,9 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     pkg_bringup = get_package_share_directory('go2_ign_bringup')
-    pkg_description = get_package_share_directory('go2_description')
     pkg_config = get_package_share_directory('go2_config')
     pkg_champ_bringup = get_package_share_directory('champ_bringup')
+    pkg_description = get_package_share_directory('go2_description')
     # ros_ign_gazebo is the Humble/Fortress naming (not ros_gz_sim which is Garden+)
     pkg_ros_ign_gazebo = get_package_share_directory('ros_ign_gazebo')
 
@@ -26,13 +26,13 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration('use_rviz', default='false')
     world_file = LaunchConfiguration(
         'world_file',
-        default=os.path.join(pkg_bringup, 'worlds', 'go2_world.sdf'),
+        default=os.path.join(pkg_bringup, 'worlds', 'industrial.sdf'),
     )
 
-    # URDF via xacro — robot.xacro is the main entry point in go2_description
+    # Wrapper xacro: upstream robot.xacro + Fortress 2D LiDAR (lidar_ign.xacro)
     robot_description = Command([
         FindExecutable(name='xacro'), ' ',
-        os.path.join(pkg_description, 'xacro', 'robot.xacro'),
+        os.path.join(pkg_bringup, 'xacro', 'go2_with_lidar.xacro'),
     ])
 
     # ── Robot State Publisher ─────────────────────────────────
@@ -163,7 +163,7 @@ def generate_launch_description():
                               description='Launch RViz2'),
         DeclareLaunchArgument('world_file',
                               default_value=os.path.join(
-                                  pkg_bringup, 'worlds', 'go2_world.sdf'),
+                                  pkg_bringup, 'worlds', 'industrial.sdf'),
                               description='Path to Gazebo Fortress .sdf world'),
         robot_state_publisher,
         gazebo,
