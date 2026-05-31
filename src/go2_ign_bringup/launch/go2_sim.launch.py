@@ -152,16 +152,16 @@ def generate_launch_description():
         }.items(),
     )
 
-    # ── Static TF: bridge Ignition sensor frame to URDF frame ────
-    # Fortress names the sensor frame "go2/base_link/front_laser_sensor"
-    # (scoped from the model). SLAM/Nav2 expect the URDF frame "front_laser".
-    lidar_frame_bridge = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='lidar_frame_bridge',
-        arguments=['0', '0', '0', '0', '0', '0',
-                   'front_laser', 'go2/base_link/front_laser_sensor'],
+    # ── Scan frame relay ──────────────────────────────────────
+    # ros_ign_bridge publishes the raw scan to /scan_raw with Ignition's scoped
+    # frame_id (go2/base_link/front_laser_sensor). This relay republishes to
+    # /scan with frame_id=front_laser so TF lookups in SLAM/Nav2 succeed.
+    scan_relay = Node(
+        package='go2_nav',
+        executable='scan_frame_relay',
+        name='scan_frame_relay',
         output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
     )
 
     # ── RViz2 (optional, delayed so Gazebo finishes loading first) ──
@@ -194,6 +194,6 @@ def generate_launch_description():
         delayed_controllers,
         spawn_effort_after_jsb,
         champ_bringup,
-        lidar_frame_bridge,
+        scan_relay,
         rviz,
     ])

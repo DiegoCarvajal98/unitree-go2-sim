@@ -23,6 +23,7 @@ setup(
     entry_points={
         'console_scripts': [
             'square_trajectory = go2_nav.square_trajectory:main',
+            'scan_frame_relay = go2_nav.scan_frame_relay:main',
         ],
     },
 )
