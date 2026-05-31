@@ -39,6 +39,8 @@ def generate_launch_description():
         value_type=str,
     )
 
+    rviz_config_path = os.path.join(pkg_bringup, 'rviz', 'go2.rviz')
+
     # ── Robot State Publisher ─────────────────────────────────
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -162,14 +164,18 @@ def generate_launch_description():
         output='screen',
     )
 
-    # ── RViz2 (optional) ──────────────────────────────────────
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        parameters=[{'use_sim_time': use_sim_time}],
-        condition=IfCondition(use_rviz),
-        output='screen',
+    # ── RViz2 (optional, delayed so Gazebo finishes loading first) ──
+    rviz = TimerAction(
+        period=10.0,
+        actions=[Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            parameters=[{'use_sim_time': use_sim_time}],
+            condition=IfCondition(use_rviz),
+            output='screen',
+            arguments=['-d', rviz_config_path],
+        )],
     )
 
     return LaunchDescription([
