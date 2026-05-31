@@ -38,12 +38,20 @@
     message header; if it arrives as "go2/front_laser" instead of
     "front_laser" add a static_transform_publisher in go2_sim.launch.py.
   -->
+  <!--
+    gpu_lidar is the correct Ignition Gazebo Fortress sensor type for 2D/3D LiDAR.
+    type="ray" is a Gazebo Classic type and does not publish to Ignition topics.
+    <lidar> replaces <ray> as the sensor element in Ignition SDF.
+    <frame_id> sets the header.frame_id in the published LaserScan message.
+  -->
   <gazebo reference="front_laser">
-    <sensor name="front_laser_sensor" type="ray">
+    <sensor name="front_laser_sensor" type="gpu_lidar">
       <always_on>true</always_on>
       <visualize>false</visualize>
       <update_rate>10</update_rate>
-      <ray>
+      <topic>/scan</topic>
+      <frame_id>front_laser</frame_id>
+      <lidar>
         <scan>
           <horizontal>
             <samples>720</samples>
@@ -62,8 +70,7 @@
           <mean>0.0</mean>
           <stddev>0.01</stddev>
         </noise>
-      </ray>
-      <topic>/scan</topic>
+      </lidar>
     </sensor>
   </gazebo>
 
