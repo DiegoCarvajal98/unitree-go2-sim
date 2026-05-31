@@ -48,7 +48,7 @@
       <visualize>true</visualize>
       <update_rate>10</update_rate>
       <topic>/scan</topic>
-      <lidar>
+      <ray>
         <scan>
           <horizontal>
             <samples>720</samples>
@@ -67,7 +67,7 @@
           <mean>0.0</mean>
           <stddev>0.01</stddev>
         </noise>
-      </lidar>
+      </ray>
     </sensor>
   </gazebo>
 
