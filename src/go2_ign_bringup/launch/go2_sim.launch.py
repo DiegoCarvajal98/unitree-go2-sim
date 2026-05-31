@@ -140,10 +140,16 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'robot_name': 'go2',
-            'gazebo': 'true',
+            # gazebo=false: use CHAMP's internal kinematics-based contact detection.
+            # gazebo=true requires champ_gazebo (Classic Gazebo plugin) which is excluded.
+            'gazebo': 'false',
             'hardware_connected': 'false',
-            'publish_foot_contacts': 'false',
+            # publish_foot_contacts=true: controller publishes contacts for state estimator.
+            # Setting this false breaks state estimation (estimator receives no contacts).
+            'publish_foot_contacts': 'true',
             'close_loop_odom': 'false',
+            # orientation_from_imu=true: fuse IMU orientation into state estimation.
+            'orientation_from_imu': 'true',
             'joint_controller_topic': 'joint_group_effort_controller/joint_trajectory',
             'joints_map_path': os.path.join(pkg_config, 'config', 'joints', 'joints.yaml'),
             'links_map_path': os.path.join(pkg_config, 'config', 'links', 'links.yaml'),
