@@ -33,25 +33,19 @@
   </link>
 
   <!--
-    Fortress sensor: topic /scan is an Ignition topic bridged to ROS by
-    gz_bridge.yaml.  frame_id is set by the bridge from the Ignition
-    message header; if it arrives as "go2/front_laser" instead of
-    "front_laser" add a static_transform_publisher in go2_sim.launch.py.
-  -->
-  <!--
-    gpu_lidar is the correct Ignition Gazebo Fortress sensor type for 2D/3D LiDAR.
-    type="ray" is a Gazebo Classic type and does not publish to Ignition topics.
-    <lidar> replaces <ray> as the sensor element in Ignition SDF.
-    <frame_id> sets the header.frame_id in the published LaserScan message.
+    type="ray" is the Ignition Gazebo Fortress CPU-based lidar sensor.
+    It publishes ignition.msgs.LaserScan to the topic set below.
+    - Do NOT use <frame_id>: it is not valid SDF and breaks sensor conversion.
+    - Do NOT use type="gpu_lidar": requires a GPU render context that may not
+      be available inside the container and uses <lidar> not <ray>.
+    - The absolute topic /scan is bridged to ROS by gz_bridge.yaml.
   -->
   <gazebo reference="front_laser">
-    <sensor name="front_laser_sensor" type="gpu_lidar">
+    <sensor name="front_laser_sensor" type="ray">
       <always_on>true</always_on>
-      <visualize>false</visualize>
+      <visualize>true</visualize>
       <update_rate>10</update_rate>
-      <topic>/scan</topic>
-      <frame_id>front_laser</frame_id>
-      <lidar>
+      <ray>
         <scan>
           <horizontal>
             <samples>720</samples>
@@ -70,7 +64,8 @@
           <mean>0.0</mean>
           <stddev>0.01</stddev>
         </noise>
-      </lidar>
+      </ray>
+      <topic>/scan</topic>
     </sensor>
   </gazebo>
 
