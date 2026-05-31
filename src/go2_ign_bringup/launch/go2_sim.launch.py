@@ -150,6 +150,18 @@ def generate_launch_description():
         }.items(),
     )
 
+    # ── Static TF: bridge Ignition sensor frame to URDF frame ────
+    # Fortress names the sensor frame "go2/base_link/front_laser_sensor"
+    # (scoped from the model). SLAM/Nav2 expect the URDF frame "front_laser".
+    lidar_frame_bridge = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='lidar_frame_bridge',
+        arguments=['0', '0', '0', '0', '0', '0',
+                   'front_laser', 'go2/base_link/front_laser_sensor'],
+        output='screen',
+    )
+
     # ── RViz2 (optional) ──────────────────────────────────────
     rviz = Node(
         package='rviz2',
@@ -176,5 +188,6 @@ def generate_launch_description():
         delayed_controllers,
         spawn_effort_after_jsb,
         champ_bringup,
+        lidar_frame_bridge,
         rviz,
     ])
