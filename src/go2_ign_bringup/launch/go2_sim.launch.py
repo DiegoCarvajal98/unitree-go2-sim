@@ -12,6 +12,7 @@ from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, FindExecutable, LaunchConfiguration
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description():
@@ -30,10 +31,13 @@ def generate_launch_description():
     )
 
     # Wrapper xacro: upstream robot.xacro + Fortress 2D LiDAR (lidar_ign.xacro)
-    robot_description = Command([
-        FindExecutable(name='xacro'), ' ',
-        os.path.join(pkg_bringup, 'xacro', 'go2_with_lidar.xacro'),
-    ])
+    robot_description = ParameterValue(
+        Command([
+            FindExecutable(name='xacro'), ' ',
+            os.path.join(pkg_bringup, 'xacro', 'go2_with_lidar.xacro'),
+        ]),
+        value_type=str,
+    )
 
     # ── Robot State Publisher ─────────────────────────────────
     robot_state_publisher = Node(
