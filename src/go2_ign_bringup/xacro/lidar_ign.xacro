@@ -22,7 +22,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find go2_description)/meshes/hokuyo.dae"/>
+        <box size="0.07 0.07 0.07"/>
       </geometry>
     </visual>
     <inertial>
@@ -33,19 +33,22 @@
   </link>
 
   <!--
-    type="ray" is the Ignition Gazebo Fortress CPU-based lidar sensor.
-    It publishes ignition.msgs.LaserScan to the topic set below.
-    - Do NOT use <frame_id>: it is not valid SDF and breaks sensor conversion.
-    - Do NOT use type="gpu_lidar": requires a GPU render context that may not
-      be available inside the container and uses <lidar> not <ray>.
-    - The absolute topic /scan is bridged to ROS by gz_bridge.yaml.
+    gpu_lidar is the correct Ignition Gazebo Fortress native sensor type for lidar.
+    type="ray" is a Gazebo Classic type — Ignition does not publish it to any topic.
+    Rules:
+      - Use <lidar> (NOT <ray>) as the inner element for gpu_lidar.
+      - Do NOT add <frame_id>: it is not valid SDF and silently kills the sensor
+        during URDF-to-SDF conversion (the sensor disappears from the model).
+      - <topic>/scan</topic> sets an absolute Ignition topic path (leading / = absolute).
+        The Sensors world plugin bridges it; ros_ign_bridge maps it to ROS /scan.
   -->
   <gazebo reference="front_laser">
-    <sensor name="front_laser_sensor" type="ray">
+    <sensor name="front_laser_sensor" type="gpu_lidar">
       <always_on>true</always_on>
       <visualize>true</visualize>
       <update_rate>10</update_rate>
-      <ray>
+      <topic>/scan</topic>
+      <lidar>
         <scan>
           <horizontal>
             <samples>720</samples>
@@ -64,8 +67,7 @@
           <mean>0.0</mean>
           <stddev>0.01</stddev>
         </noise>
-      </ray>
-      <topic>/scan</topic>
+      </lidar>
     </sensor>
   </gazebo>
 
