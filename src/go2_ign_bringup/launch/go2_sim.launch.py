@@ -166,7 +166,7 @@ def generate_launch_description():
 
     # ── RViz2 (optional, delayed so Gazebo finishes loading first) ──
     rviz = TimerAction(
-        period=10.0,
+        period=15.0,
         actions=[Node(
             package='rviz2',
             executable='rviz2',
