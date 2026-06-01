@@ -181,10 +181,15 @@ unitree-go2-sim/
     │       └── go2_world.sdf          # Simple flat world
     └── go2_nav/            # Navigation nodes
         ├── go2_nav/
-        │   └── square_trajectory.py  # Timed square trajectory node
+        │   ├── square_trajectory.py  # Timed square trajectory node
+        │   ├── scan_frame_relay.py   # Republishes /scan_raw → /scan with correct frame_id
+        │   └── imu_frame_relay.py    # Republishes /imu_raw → /imu/data with frame_id=imu_link
         ├── config/
         │   ├── nav2_params.yaml      # Nav2 stack parameters
         │   └── slam_params.yaml      # SLAM Toolbox parameters
+        ├── maps/
+        │   ├── industrial_map.pgm    # Saved occupancy grid (industrial warehouse)
+        │   └── industrial_map.yaml   # Map metadata (resolution, origin, thresholds)
         └── launch/
             ├── square.launch.py      # Square trajectory
             ├── slam.launch.py        # SLAM mapping
@@ -219,18 +224,25 @@ unitree-go2-sim/
 1. `robot_state_publisher` — publishes the Go2 URDF (with LiDAR) to `/robot_description`
 2. Gazebo Fortress — loads `industrial.sdf` (override with `world_file:=...`)
 3. `ros_ign_gazebo create` — spawns the robot at z=0.35 m
-4. `ros_ign_bridge` — bridges `/clock`, `/tf`, `/imu/data`, `/scan`
+4. `ros_ign_bridge` — bridges `/clock`, `/tf`, `/imu_raw`, `/scan`
 5. *(5 s delay)* `joint_states_controller` spawner
 6. `joint_group_effort_controller` spawner (after joint_states_controller exits)
 7. `champ_bringup` — CHAMP locomotion; subscribes `/cmd_vel`, publishes joint trajectories
-8. `static_transform_publisher` — bridges the Ignition scoped sensor frame (`go2/base_link/front_laser_sensor`) to the URDF TF frame (`front_laser`)
-9. *(15 s delay)* RViz2 (optional, `use_rviz:=true`)
+8. `imu_frame_relay` — republishes `/imu_raw` as `/imu/data` with `frame_id=imu_link`
+9. `scan_frame_relay` — republishes `/scan_raw` as `/scan` with `frame_id=front_laser`
+10. *(15 s delay)* RViz2 (optional, `use_rviz:=true`)
 
 ### LiDAR Integration Notes
 
 Fortress scopes sensor frame IDs as `{model}/{link}/{sensor_name}`. A zero static transform is published from `front_laser` (URDF frame) to `go2/base_link/front_laser_sensor` (Ignition frame) so SLAM and Nav2 can resolve the sensor pose through the TF tree.
 
+The `scan_frame_relay` node (`go2_nav`) subscribes to `/scan_raw` (the raw bridge topic, which carries the Ignition-scoped frame_id `go2/base_link/front_laser_sensor`) and republishes to `/scan` with `frame_id=front_laser`, keeping SLAM Toolbox's TF lookups consistent.
+
 The URDF entry point is `go2_with_lidar.xacro`, a thin wrapper that composes the upstream `robot.xacro` with `lidar_ign.xacro` without patching any upstream files.
+
+### IMU Integration Notes
+
+Fortress publishes the IMU with a scoped frame_id (`go2/base_link/imu_sensor`) that does not exist in the URDF TF tree. The bridge is configured to publish the raw data on `/imu_raw`, and the `imu_frame_relay` node (`go2_nav`) republishes it on `/imu/data` with `frame_id=imu_link`, matching the URDF frame that `robot_localization` EKF looks up in TF.
 
 ### ros2_control Setup
 

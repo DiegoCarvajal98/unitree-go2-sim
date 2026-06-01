@@ -158,6 +158,17 @@ def generate_launch_description():
         }.items(),
     )
 
+    # ── IMU frame relay ───────────────────────────────────────
+    # Fortress scopes the IMU frame as "go2/base_link/imu_sensor".
+    # The robot_localization EKF expects "imu_link" (the URDF link).
+    imu_relay = Node(
+        package='go2_nav',
+        executable='imu_frame_relay',
+        name='imu_frame_relay',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+    )
+
     # ── Scan frame relay ──────────────────────────────────────
     # ros_ign_bridge publishes the raw scan to /scan_raw with Ignition's scoped
     # frame_id (go2/base_link/front_laser_sensor). This relay republishes to
@@ -200,6 +211,7 @@ def generate_launch_description():
         delayed_controllers,
         spawn_effort_after_jsb,
         champ_bringup,
+        imu_relay,
         scan_relay,
         rviz,
     ])

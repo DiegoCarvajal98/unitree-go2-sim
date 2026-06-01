@@ -13,7 +13,7 @@
   gz_type_name: "ignition.msgs.Pose_V"
   direction: GZ_TO_ROS
 
-- ros_topic_name: "/imu/data"
+- ros_topic_name: "/imu_raw"
   gz_topic_name: "/world/industrial/model/go2/link/base_link/sensor/imu_sensor/imu"
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "ignition.msgs.IMU"
